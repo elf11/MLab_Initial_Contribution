@@ -56,6 +56,15 @@ group each by
   servers, date
 order by date;
 
+For 1000 rows selected:
+
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example02_query1_1000rows_limit.png)
+
+For 100 rows selected:
+
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example02_query1_100rows_limit.png)
+
+(Still trying to figure out how to interpret this better...)
 
 query2:
 
@@ -93,6 +102,8 @@ from (
     date 
   order by 
     date;
+
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example01_from_query2.png)
 
 RTT: the query used to pull RTT data from the M-Lab BigQuery dataset.
 It selects the following columns: logged time (log_time),M-Lab server IP (connection_spec.server_ip), destination IP for traceroute hop - towards the client - paris_traceroute_hop.dest_ip, average of RTT in the same traceroute and hop.

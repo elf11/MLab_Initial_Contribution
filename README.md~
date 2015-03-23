@@ -1,7 +1,6 @@
 # MLab_Initial_Contribution
 
 
-
 This is still a work in progress, I am not extremely happy with how the graphs look like, it's not exactly relevant, still have to do the graph for the RTT Query.
 
 1. I have started using bigQuery by looking through the examples presented on the Mlab page https://cloud.google.com/bigquery/docs/dataset-mlab , I first run the querries using the GUI provided by Google Api inside the browser, then I've set up bigQuery command line tool on my Ubuntu machine.
@@ -57,6 +56,15 @@ group each by
   servers, date
 order by date;
 
+For 1000 rows selected:
+
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example02_query1_1000rows_limit.png)
+
+For 100 rows selected:
+
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example01_from_query2.png)
+
+(Still trying to figure out how to interpret this better...)
 
 query2:
 
@@ -94,6 +102,8 @@ from (
     date 
   order by 
     date;
+
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example01_from_query2.png)
 
 RTT: the query used to pull RTT data from the M-Lab BigQuery dataset.
 It selects the following columns: logged time (log_time),M-Lab server IP (connection_spec.server_ip), destination IP for traceroute hop - towards the client - paris_traceroute_hop.dest_ip, average of RTT in the same traceroute and hop.
