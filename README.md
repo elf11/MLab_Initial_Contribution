@@ -138,6 +138,7 @@ In this query tried to use another tool from M-Lab the paris-traceroute utility.
 The query can be run by running my bg.py script like this: pythong bg.py 3
 
 The query checks that the RTT field is valid (not null) paris_traceroute_hop.rtt and it was performed between 1st of July 2014 and 2nd of July 2014 (00:00:00 GMT). I've groupped the result by time and the IPs. In this way I could average multiple traceroute rtt entries.
+The initial query looked like the one below, and returned the RTT (round time trip) between a server and a client, but I wanted to see a statistics of the number of clients and the average rtt for all the clients to each distinct server. This was a globally run query, it can be improved by adding restrictions to only run it for USA.
 
 	SELECT
 		log_time as date,
@@ -159,3 +160,38 @@ The query checks that the RTT field is valid (not null) paris_traceroute_hop.rtt
 		date,
 		server,
 		dest;
+
+* The modified query that I've run is the following:
+
+	select
+	  server,
+	  count(distinct server) as server_no,
+	  count(distinct dest) as client_no,
+	  avg(rtt) as rtt,
+	from (
+		SELECT
+			log_time as date,
+			connection_spec.server_ip as server,
+			paris_traceroute_hop.dest_ip as dest,
+			AVG(paris_traceroute_hop.rtt) AS rtt
+		FROM 
+			[measurement-lab:m_lab.2014_07]
+		WHERE
+			project = 3 AND
+		    	log_time > 1404172800 AND
+			log_time < 1404259200 AND
+			log_time IS NOT NULL AND
+			connection_spec.server_ip IS NOT NULL AND
+			paris_traceroute_hop.dest_ip IS NOT NULL AND
+			paris_traceroute_hop.rtt IS NOT NULL AND
+			connection_spec.client_ip != paris_traceroute_hop.dest_ip
+		GROUP EACH BY
+			date,
+			server,
+			dest
+	) group by 
+		server
+	order by
+		rtt;
+
+* The graph that I created visualises the first 50 results, and plots the number of clients(X) and the average RTT (Y).
