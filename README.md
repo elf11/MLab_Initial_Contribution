@@ -196,7 +196,7 @@ The initial query looked like the one below, and returned the RTT (round time tr
 			rtt;
 
 * The graph that I created visualises the first 50 results, and plots the number of clients(X) and the average RTT (Y).
-* The result that I was expecting was that even though for each individual client-server the RTT was sometimes quite high, on average, for all the clients connected to the same server the RTT is stable (same for all, it gets averaged to almost the same value). The loss is not so bad on average. The results of the query proved me wrong, meaning that some servers still have a bad RTT with their clients on average, sometimes huge, for example there are servers with an average number of clients around 2000 which have and RTT around 400.
+* The result that I was expecting was that even though for each individual client-server the RTT was sometimes quite high, on average, for all the clients connected to the same server the RTT is stable (same for all, it gets averaged to almost the same value). The loss is not so bad on average. The results of the query proved me wrong, meaning that some servers still have a bad RTT with their clients on average, sometimes huge, for example there are servers with an average number of clients around 2000 which have and RTT around 400. It looks like on average servers with a bigger number of clients fare better than those with a smaller number when it comes to RTT, but for this to be relevant we should have other type of information about those servers (like their loading, capacity etc). Also, most of those servers are clustered around the 30-80 mark on RTT for a number of clients between ~2800 and 6000.
 
 ![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/query3.png)
 
