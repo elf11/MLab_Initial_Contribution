@@ -27,9 +27,11 @@ The following considerations are available for the first 2 examples:
 * something else that I've realized after reanalyzing the queries was the fact that I've ignored the web100_log_entry.is_last_entry = True , as said in the PDEChartsNDT documentation this indicates to BigQuery the result of the tests.
 * some of the problems I've encountered while structuring and visualizing the results of the queries were that there was too much data and couldn't figure out a nice/neat way to make it easily readable
 
-query2:
-client-to-server
-One of the model querries from the PDE document; I've aggregated the data based by the date and the throughput sum and order by date.
+<b>First query<b> 
+
+It is actually the second query in my bg.py script, it can be selected by running : python bg.py 2
+
+This is a variation on the upload throughput query from the PDEChartsNDT documentation.  What I've did was to aggregate the transferred upload throughput for each day over a period of time of 6 months initially, the last 6 months of the 2012 year. In this case I was expecting the graph to look quite stable with some spikes around important dates in the year. The visualization of the dates on the graph are quite skewed - have to figure out how to make them look normal, but it can be seen that there's an increase in the upload from month to month, having a peak over october-november ant then going slightly down.
 
 	select 
 	  date,
@@ -58,12 +60,13 @@ One of the model querries from the PDE document; I've aggregated the data based 
 	    web100_log_entry.snap.Duration >= 900000 AND 
 	    web100_log_entry.snap.Duration < 3600000000 AND 
 	    (web100_log_entry.snap.State == 1 OR (web100_log_entry.snap.State >= 5 AND web100_log_entry.snap.State <= 11))
-	  ) 
+	  )
 	  group by 
 	    date 
 	  order by 
 	    date;
 
+* The graph over the last 6 months can be seen in the figure below
 ![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example01.png)
 
 query1:
