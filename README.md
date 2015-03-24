@@ -80,7 +80,7 @@ It is actually the first query in my bg.py script, it can be selected by running
 
 The query selects the all the USA servers to which a number of at least 1000 clients have done an upload over the month of July 2012. The structure of the returned data of the query is like this:
 	servers		date 	total_bytes	clients
-The query is ordered by date, to have the data returned in order. I still have to refine this query, I consider that the plotted data is not useful at all in this stage. I've tried to limit the number of rows returned by the query to around 100, still it wasn't pretty. The thing is that the graph that I am trying to plot is the uploaded data per client at one US server. The uploaded throughput in bytes has been first transformed in TB then it has been divided by the number of clients (distinct) that connected to that server.
+The query is ordered by date, to have the data returned in order. I still have to refine this query, I consider that the plotted data is not useful at all in this stage. I've tried to limit the number of rows returned by the query to around 100, still it wasn't pretty. The thing is that the graph that I am trying to plot is the uploaded data per client at one US server. The uploaded throughput in bytes has been first transformed in GB then it has been divided by the number of clients (distinct) that connected to that server.
 
 	select 
 	  local_ip as servers,
@@ -127,11 +127,17 @@ The query is ordered by date, to have the data returned in order. I still have t
 
 (Still trying to figure out how to interpret this better...)
 
-RTT: the query used to pull RTT data from the M-Lab BigQuery dataset.
-It selects the following columns: logged time (log_time),M-Lab server IP (connection_spec.server_ip), destination IP for traceroute hop - towards the client - paris_traceroute_hop.dest_ip, average of RTT in the same traceroute and hop.
-The Query is performed using the Paris traceroute M-Lab utility tool and for entries logged on between 1st July 2014 and 2nd July 2014 (00:00:00 GMT). Also the field paris_traceroute_hop.rtt must not be null, the RTT data exists. The result is grouped by time and the IPs, in this way I can average multiple traceroute rtt entries.
-data structure:
-date	server	dest	rtt
+<b>Third Query</b>
+
+In this query tried to use another tool from M-Lab the paris-traceroute utility. I used the paris-traceroute utility (project=3) to pull RTT data from the M-Lab BigQuery dataset. The query selects the following columns:
+* logged time (log_time)
+* M-Lab server IP (connection_spec.server_ip) 
+* destination IP for traceroute hop - towards the client - paris_traceroute_hop.dest_ip 
+* average of RTT in the same traceroute and hop
+
+The query can be run by running my bg.py script like this: pythong bg.py 3
+
+The query checks that the RTT field is valid (not null) paris_traceroute_hop.rtt and it was performed between 1st of July 2014 and 2nd of July 2014 (00:00:00 GMT). I've groupped the result by time and the IPs. In this way I could average multiple traceroute rtt entries.
 
 	SELECT
 		log_time as date,
