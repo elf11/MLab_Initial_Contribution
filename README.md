@@ -163,36 +163,36 @@ The initial query looked like the one below, and returned the RTT (round time tr
 
 * The modified query that I've run is the following:
 
-	select
-	  server,
-	  count(distinct server) as server_no,
-	  count(distinct dest) as client_no,
-	  avg(rtt) as rtt,
-	from (
 		SELECT
-			log_time as date,
-			connection_spec.server_ip as server,
-			paris_traceroute_hop.dest_ip as dest,
-			AVG(paris_traceroute_hop.rtt) AS rtt
-		FROM 
-			[measurement-lab:m_lab.2014_07]
-		WHERE
-			project = 3 AND
-		    	log_time > 1404172800 AND
-			log_time < 1404259200 AND
-			log_time IS NOT NULL AND
-			connection_spec.server_ip IS NOT NULL AND
-			paris_traceroute_hop.dest_ip IS NOT NULL AND
-			paris_traceroute_hop.rtt IS NOT NULL AND
-			connection_spec.client_ip != paris_traceroute_hop.dest_ip
-		GROUP EACH BY
-			date,
-			server,
-			dest
-	) group by 
-		server
-	order by
-		rtt;
+		  server,
+		  count(distinct server) as server_no,
+		  count(distinct dest) as client_no,
+		  AVG(rtt) as rtt,
+		FROM (
+			SELECT
+				log_time as date,
+				connection_spec.server_ip as server,
+				paris_traceroute_hop.dest_ip as dest,
+				AVG(paris_traceroute_hop.rtt) AS rtt
+			FROM 
+				[measurement-lab:m_lab.2014_07]
+			WHERE
+				project = 3 AND
+			    	log_time > 1404172800 AND
+				log_time < 1404259200 AND
+				log_time IS NOT NULL AND
+				connection_spec.server_ip IS NOT NULL AND
+				paris_traceroute_hop.dest_ip IS NOT NULL AND
+				paris_traceroute_hop.rtt IS NOT NULL AND
+				connection_spec.client_ip != paris_traceroute_hop.dest_ip
+			GROUP EACH BY
+				date,
+				server,
+				dest
+		) GROUP BY 
+			server
+		ORDER BY
+			rtt;
 
 * The graph that I created visualises the first 50 results, and plots the number of clients(X) and the average RTT (Y).
 * The result that I was expecting was that even though for each individual client-server the RTT was sometimes quite high, on average, for all the clients connected to the same server the RTT is stable (same for all, it gets averaged to almost the same value). The loss is not so bad on average. The results of the query proved me wrong, meaning that some servers still have a bad RTT with their clients on average, sometimes huge.

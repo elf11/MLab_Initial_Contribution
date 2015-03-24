@@ -163,12 +163,12 @@ The initial query looked like the one below, and returned the RTT (round time tr
 
 * The modified query that I've run is the following:
 
-	select
+	SELECT
 	  server,
 	  count(distinct server) as server_no,
 	  count(distinct dest) as client_no,
-	  avg(rtt) as rtt,
-	from (
+	  AVG(rtt) as rtt,
+	FROM (
 		SELECT
 			log_time as date,
 			connection_spec.server_ip as server,
@@ -189,9 +189,9 @@ The initial query looked like the one below, and returned the RTT (round time tr
 			date,
 			server,
 			dest
-	) group by 
+	) GROUP BY 
 		server
-	order by
+	ORDER BY
 		rtt;
 
 * The graph that I created visualises the first 50 results, and plots the number of clients(X) and the average RTT (Y).
