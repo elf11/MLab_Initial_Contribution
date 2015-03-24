@@ -31,7 +31,7 @@ The following considerations are available for the first 2 examples:
 
 It is actually the second query in my bg.py script, it can be selected by running : python bg.py 2
 
-This is a variation on the upload throughput query from the PDEChartsNDT documentation.  What I've did was to aggregate the transferred upload throughput for each day over a period of time of 6 months initially, the last 6 months of the 2012 year. In this case I was expecting the graph to look quite stable with some spikes around important dates in the year. The visualization of the dates on the graph are quite skewed - have to figure out how to make them look normal, but it can be seen that there's an increase in the upload from month to month, having a peak over october-november ant then going slightly down.
+This is a variation on the upload throughput query from the PDEChartsNDT documentation.  What I've did was to aggregate the transferred upload throughput for each day over a period of time of 6 months initially, the last 6 months of the 2012 year. In this case I was expecting the graph to look quite stable with some spikes around important dates in the year. The visualization of the dates on the graph are quite skewed - have to figure out how to make them look normal, but it can be seen that there's an increase in the upload from month to month, having a peak over october-november ant then going slightly down. The group by and order by date aggregation was done to be able to have statistics monthly, in a nice format.
 
 	select 
 	  date,
@@ -66,16 +66,21 @@ This is a variation on the upload throughput query from the PDEChartsNDT documen
 	  order by 
 	    date;
 
+* The graphs outputs the upload throughput on Y over a time period that is defined on X.
 * The graph over the last 6 months can be seen in the figure below
-![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example01.png)
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/query2_6months.png)
 
-query1:
-servers	date	total_bytes	clients
-client-to-server
-direction,country,local_ip,clients,date,total_bytes_transferred
-transfer from client-to-server, over the last 6 months of 2012, all the servers are from USA, the graphs are for the number of clients for each server and the total bytes tranferred from each server to all the clients.
+* The graph over July 2012 can be seen below (It can be observed that there's also a little ascending trend during this month - it will be interesting to correlate this with any major internet attacks or events that happened at that time)
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/query2_july.png)
 
-Still have to refine this query, the plotted data is not useful at all in this stage.
+
+<b>Second Query<b>
+
+It is actually the first query in my bg.py script, it can be selected by running : python bg.py 1
+
+The query selects the all the USA servers to which a number of at least 1000 clients have done an upload over the month of July 2012. The structure of the returned data of the query is like this:
+	servers		date 	total_bytes	clients
+The query is ordered by date, to have the data returned in order. I still have to refine this query, I consider that the plotted data is not useful at all in this stage. I've tried to limit the number of rows returned by the query to around 100, still it wasn't pretty. The thing is that the graph that I am trying to plot is the uploaded data per client at one US server. The uploaded throughput in bytes has been first transformed in TB then it has been divided by the number of clients (distinct) that connected to that server.
 
 	select 
 	  local_ip as servers,
@@ -89,8 +94,7 @@ Still have to refine this query, the plotted data is not useful at all in this s
 	  INTEGER(UTC_USEC_TO_DAY(web100_log_entry.log_time * 1000000)/1000000) as date,
 	  SUM(web100_log_entry.snap.HCThruOctetsReceived) as total_bytes_transferred 
 	from 
-	  [measurement-lab:m_lab.2012_07], [measurement-lab:m_lab.2012_08], [measurement-lab:m_lab.2012_09], 
-	  [measurement-lab:m_lab.2012_10], [measurement-lab:m_lab.2012_11], [measurement-lab:m_lab.2012_12] 
+	  [measurement-lab:m_lab.2012_07]
 	where 
 	  IS_EXPLICITLY_DEFINED(web100_log_entry.log_time) AND 
 	  IS_EXPLICITLY_DEFINED(web100_log_entry.connection_spec.local_ip) AND 
@@ -117,13 +121,9 @@ Still have to refine this query, the plotted data is not useful at all in this s
 	  servers, date
 	order by date;
 
-For 1000 rows selected:
+* The graph represents the US server on the X axis, and the uploaded throuput/client on the Y axis. So it's basically how much was an US server loaded by upload from clients. (Though it still looks skewed.)
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/query1_july.png)
 
-![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example02_query1_1000rows_limit.png)
-
-For 100 rows selected:
-
-![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example02_query1_100rows_limit.png)
 
 (Still trying to figure out how to interpret this better...)
 
