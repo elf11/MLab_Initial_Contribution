@@ -17,6 +17,52 @@ Where id_query might be 1,2, or eventually 3. The analysis of the querries and t
 
 <b> Analysis </b>
 
+The following analysis is done based on the 3 model querries that I've run from the bg.py script. I've initially started small with the querries, and tried to visualize some of the smaller models presented on the big-query MLab data-set page, then I've expanded and run and visualised more complex querries.
+
+The following considerations are available for the first 2 examples:
+
+* the way I decided to structure the query was highly influenced by the PDE Charts document https://code.google.com/p/m-lab/wiki/PDEChartsNDT , in there there were presented common sense rules about how to restrict the queries and to not permit incomplete tests to affect the data; I've mostly used the conditions presented in there on how to identify and take out the incomplete tests
+* next, I've considered that I should run the tests for a significant period of time, I've firstly considered to run the queries for data pertaining to the second half of 2012 (July - December). Then, after running the querries a few times and trying to sort out and correlate what I was expecting with what the data was showing I've realised that a shorter amount of time might be more appropriate, so I've decided to run the queries on the July month's data (2012).
+
+query2:
+
+One of the model querries from the PDE document; I've aggregated the data based by the date and the throughput sum and order by date.
+
+	select 
+	  date,
+	  SUM(throughput) as throughput 
+	from (
+	  SELECT 
+	    web100_log_entry.connection_spec.remote_ip as client, 
+	    web100_log_entry.connection_spec.local_ip as server, 
+	    web100_log_entry.snap.HCThruOctetsReceived/web100_log_entry.snap.Duration as throughput, 
+	    INTEGER(UTC_USEC_TO_DAY(web100_log_entry.log_time * 1000000)/1000000) as date 
+	  FROM 
+	    [measurement-lab:m_lab.2012_07], [measurement-lab:m_lab.2012_08],  [measurement-lab:m_lab.2012_09], 
+	    [measurement-lab:m_lab.2012_10],  [measurement-lab:m_lab.2012_11], [measurement-lab:m_lab.2012_12]
+	  WHERE 
+	    IS_EXPLICITLY_DEFINED(web100_log_entry.connection_spec.remote_ip) AND 
+	    IS_EXPLICITLY_DEFINED(web100_log_entry.connection_spec.local_ip) AND 
+	    IS_EXPLICITLY_DEFINED(web100_log_entry.snap.HCThruOctetsReceived) AND 
+	    IS_EXPLICITLY_DEFINED(web100_log_entry.snap.Duration) AND 
+	    IS_EXPLICITLY_DEFINED(project) AND 
+	    project = 0 AND 
+	    IS_EXPLICITLY_DEFINED(connection_spec.data_direction) AND 
+	    connection_spec.data_direction = 0 AND 
+	    IS_EXPLICITLY_DEFINED(web100_log_entry.is_last_entry) AND 
+	    web100_log_entry.is_last_entry = True AND 
+	    web100_log_entry.snap.HCThruOctetsReceived >= 8192 AND 
+	    web100_log_entry.snap.Duration >= 900000 AND 
+	    web100_log_entry.snap.Duration < 3600000000 AND 
+	    (web100_log_entry.snap.State == 1 OR (web100_log_entry.snap.State >= 5 AND web100_log_entry.snap.State <= 11))
+	  ) 
+	  group by 
+	    date 
+	  order by 
+	    date;
+
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example01.png)
+
 query1:
 servers	date	total_bytes	clients
 
@@ -72,45 +118,6 @@ For 100 rows selected:
 ![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example02_query1_100rows_limit.png)
 
 (Still trying to figure out how to interpret this better...)
-
-query2:
-
-One of the model querries from the PDE document; I've aggregated the data based by the date and the throughput sum and order by date.
-
-	select 
-	  date,
-	  SUM(throughput) as throughput 
-	from (
-	  SELECT 
-	    web100_log_entry.connection_spec.remote_ip as client, 
-	    web100_log_entry.connection_spec.local_ip as server, 
-	    web100_log_entry.snap.HCThruOctetsReceived/web100_log_entry.snap.Duration as throughput, 
-	    INTEGER(UTC_USEC_TO_DAY(web100_log_entry.log_time * 1000000)/1000000) as date 
-	  FROM 
-	    [measurement-lab:m_lab.2012_07], [measurement-lab:m_lab.2012_08],  [measurement-lab:m_lab.2012_09], 
-	    [measurement-lab:m_lab.2012_10],  [measurement-lab:m_lab.2012_11], [measurement-lab:m_lab.2012_12]
-	  WHERE 
-	    IS_EXPLICITLY_DEFINED(web100_log_entry.connection_spec.remote_ip) AND 
-	    IS_EXPLICITLY_DEFINED(web100_log_entry.connection_spec.local_ip) AND 
-	    IS_EXPLICITLY_DEFINED(web100_log_entry.snap.HCThruOctetsReceived) AND 
-	    IS_EXPLICITLY_DEFINED(web100_log_entry.snap.Duration) AND 
-	    IS_EXPLICITLY_DEFINED(project) AND 
-	    project = 0 AND 
-	    IS_EXPLICITLY_DEFINED(connection_spec.data_direction) AND 
-	    connection_spec.data_direction = 0 AND 
-	    IS_EXPLICITLY_DEFINED(web100_log_entry.is_last_entry) AND 
-	    web100_log_entry.is_last_entry = True AND 
-	    web100_log_entry.snap.HCThruOctetsReceived >= 8192 AND 
-	    web100_log_entry.snap.Duration >= 900000 AND 
-	    web100_log_entry.snap.Duration < 3600000000 AND 
-	    (web100_log_entry.snap.State == 1 OR (web100_log_entry.snap.State >= 5 AND web100_log_entry.snap.State <= 11))
-	  ) 
-	  group by 
-	    date 
-	  order by 
-	    date;
-
-![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example01.png)
 
 RTT: the query used to pull RTT data from the M-Lab BigQuery dataset.
 It selects the following columns: logged time (log_time),M-Lab server IP (connection_spec.server_ip), destination IP for traceroute hop - towards the client - paris_traceroute_hop.dest_ip, average of RTT in the same traceroute and hop.
