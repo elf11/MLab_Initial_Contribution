@@ -55,7 +55,7 @@ def bigquery(query):
 def main(argv):
 	query1 = "select local_ip as servers, date, sum(total_bytes_transferred) as total_bytes, sum(clients) as clients from (select web100_log_entry.connection_spec.local_ip as local_ip, COUNT(DISTINCT web100_log_entry.connection_spec.remote_ip) as clients, INTEGER(UTC_USEC_TO_DAY(web100_log_entry.log_time * 1000000)/1000000) as date, SUM(web100_log_entry.snap.HCThruOctetsReceived) as total_bytes_transferred from [measurement-lab:m_lab.2012_07] where IS_EXPLICITLY_DEFINED(web100_log_entry.log_time) AND IS_EXPLICITLY_DEFINED(web100_log_entry.connection_spec.local_ip) AND IS_EXPLICITLY_DEFINED(web100_log_entry.connection_spec.remote_ip) AND IS_EXPLICITLY_DEFINED(project) AND project = 0 AND IS_EXPLICITLY_DEFINED(connection_spec.data_direction) AND connection_spec.data_direction = 0 AND IS_EXPLICITLY_DEFINED(web100_log_entry.is_last_entry) AND web100_log_entry.is_last_entry = True AND IS_EXPLICITLY_DEFINED(web100_log_entry.snap.HCThruOctetsReceived) AND web100_log_entry.snap.HCThruOctetsReceived >= 8192 AND IS_EXPLICITLY_DEFINED(web100_log_entry.snap.State) AND  (web100_log_entry.snap.State == 1 || (web100_log_entry.snap.State >= 5  && web100_log_entry.snap.State <= 11)) AND IS_EXPLICITLY_DEFINED(connection_spec.server_geolocation.country_code) AND connection_spec.server_geolocation.country_code = 'US' group by date, local_ip order by date) where clients > 1000 group each by servers, date order by date;"
 	query2 = "select date,SUM(throughput) as throughput from (SELECT web100_log_entry.connection_spec.remote_ip as client, web100_log_entry.connection_spec.local_ip as server, web100_log_entry.snap.HCThruOctetsReceived/web100_log_entry.snap.Duration as throughput, INTEGER(UTC_USEC_TO_DAY(web100_log_entry.log_time * 1000000)/1000000) as date FROM [measurement-lab:m_lab.2012_07], [measurement-lab:m_lab.2012_08],  [measurement-lab:m_lab.2012_09], [measurement-lab:m_lab.2012_10],  [measurement-lab:m_lab.2012_11], [measurement-lab:m_lab.2012_12]  WHERE IS_EXPLICITLY_DEFINED(web100_log_entry.connection_spec.remote_ip) AND IS_EXPLICITLY_DEFINED(web100_log_entry.connection_spec.local_ip) AND IS_EXPLICITLY_DEFINED(web100_log_entry.snap.HCThruOctetsReceived) AND IS_EXPLICITLY_DEFINED(web100_log_entry.snap.Duration) AND IS_EXPLICITLY_DEFINED(project) AND project = 0 AND IS_EXPLICITLY_DEFINED(connection_spec.data_direction) AND connection_spec.data_direction = 0 AND IS_EXPLICITLY_DEFINED(web100_log_entry.is_last_entry) AND web100_log_entry.is_last_entry = True AND web100_log_entry.snap.HCThruOctetsReceived >= 8192 AND web100_log_entry.snap.Duration >= 900000 AND web100_log_entry.snap.Duration < 3600000000 AND (web100_log_entry.snap.State == 1 OR (web100_log_entry.snap.State >= 5 AND web100_log_entry.snap.State <= 11))) group by date order by date;"
-	query3 = "select server, count(distinct server) as server_no, count(distinct dest) as client_no, avg(rtt) as rtt from (SELECT log_time as date, connection_spec.server_ip as server,paris_traceroute_hop.dest_ip as dest, AVG(paris_traceroute_hop.rtt) AS rtt FROM [measurement-lab:m_lab.2014_07] WHERE project = 3 AND log_time > 1404172800 AND log_time < 1404259200 AND log_time IS NOT NULL AND connection_spec.server_ip IS NOT NULL ANDparis_traceroute_hop.dest_ip IS NOT NULL AND paris_traceroute_hop.rtt IS NOT NULL AND connection_spec.client_ip != paris_traceroute_hop.dest_ip GROUP EACH BY date, server, dest) group by server order by rtt, client_no;"
+	query3 = "select server, count(distinct server) as server_no, count(distinct dest) as client_no, avg(rtt) as rtt from (SELECT log_time as date, connection_spec.server_ip as server,paris_traceroute_hop.dest_ip as dest, AVG(paris_traceroute_hop.rtt) AS rtt FROM [measurement-lab:m_lab.2014_07] WHERE project = 3 AND log_time > 1404172800 AND log_time < 1404259200 AND log_time IS NOT NULL AND connection_spec.server_ip IS NOT NULL AND paris_traceroute_hop.dest_ip IS NOT NULL AND paris_traceroute_hop.rtt IS NOT NULL AND connection_spec.client_ip != paris_traceroute_hop.dest_ip GROUP EACH BY date, server, dest) group by server order by rtt, client_no;"
 	
 	markers = []
 
@@ -139,14 +139,14 @@ def main(argv):
 
 		#graph.plot(x, y, 'r-o')
 		graph.plot(x, y, linestyle='None', marker=styles[1], color='b', markersize=7)
-		graph.set_xticks(x)
-		graph.set_xticklabels(
-			[datetime.datetime.fromtimestamp(int(date)).strftime('%Y-%m-%d') for date in date_list]
-			)
+		#graph.set_xticks(x)
+		#graph.set_xticklabels(
+		#	[datetime.datetime.fromtimestamp(int(date)).strftime('%Y-%m-%d') for date in date_list]
+		#	)
 
 		pyplot.savefig('query2.png')
 	elif query_no == 3: #will run this one with a limit of 100 rows
-		diction = bigquery(query1)
+		diction = bigquery(query3)
 		client_no = []
 		rtt_val = []
 
@@ -162,10 +162,7 @@ def main(argv):
 		fig = pyplot.figure()
 		graph = fig.add_subplot(111)
 
-		#graph.plot(x, y, 'r-o')
-		graph.plot(x, y, linestyle='None', marker=styles[1], color='b', markersize=7)
-		graph.set_xticks(x)
-		graph.set_xticklabels(client for client in client_no)
+		graph.plot(x, y, linestyle='None', marker=styles[1], color='r', markersize=7)
 		pyplot.savefig('query3.png')
 if __name__ == "__main__":
 	main(sys.argv[1:])

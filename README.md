@@ -1,7 +1,8 @@
 # MLab_Initial_Contribution
 
+Initial contribution for the Socieconomic geography of access & performance MLab Outreachy project. 
 
-This is still a work in progress, I am not extremely happy with how the graphs look like, it's not exactly relevant, still have to do the graph for the RTT Query.
+This document describes my initial contribution to the MLab project and my first contact with BigQuery, how I structured and visualised the data and some preliminary conclusions.
 
 1. I have started using bigQuery by looking through the examples presented on the Mlab page https://cloud.google.com/bigquery/docs/dataset-mlab , I first run the querries using the GUI provided by Google Api inside the browser, then I've set up bigQuery command line tool on my Ubuntu machine.
  There weren't any major problems that I've run into while playing with the command line tool or the GUI tool for that matter. The only thing that had the potential to raise problems was how to connect your bigQuery tool to your Google API Console, but I had experience with that before in one of my projects so it wasn't a hurdle.
