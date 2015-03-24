@@ -23,9 +23,12 @@ The following considerations are available for the first 2 examples:
 
 * the way I decided to structure the query was highly influenced by the PDE Charts document https://code.google.com/p/m-lab/wiki/PDEChartsNDT , in there there were presented common sense rules about how to restrict the queries and to not permit incomplete tests to affect the data; I've mostly used the conditions presented in there on how to identify and take out the incomplete tests
 * next, I've considered that I should run the tests for a significant period of time, I've firstly considered to run the queries for data pertaining to the second half of 2012 (July - December). Then, after running the querries a few times and trying to sort out and correlate what I was expecting with what the data was showing I've realised that a shorter amount of time might be more appropriate, so I've decided to run the queries on the July month's data (2012).
+* the general structure of the queries was influenced mainly by what I wanted to measure, I've run both queries with transfer from the client to the server connection_spec.data_direction = 0 , meaning that I've measured the upload
+* something else that I've realized after reanalyzing the queries was the fact that I've ignored the web100_log_entry.is_last_entry = True , as said in the PDEChartsNDT documentation this indicates to BigQuery the result of the tests.
+* some of the problems I've encountered while structuring and visualizing the results of the queries were that there was too much data and couldn't figure out a nice/neat way to make it easily readable
 
 query2:
-
+client-to-server
 One of the model querries from the PDE document; I've aggregated the data based by the date and the throughput sum and order by date.
 
 	select 
@@ -65,7 +68,7 @@ One of the model querries from the PDE document; I've aggregated the data based 
 
 query1:
 servers	date	total_bytes	clients
-
+client-to-server
 direction,country,local_ip,clients,date,total_bytes_transferred
 transfer from client-to-server, over the last 6 months of 2012, all the servers are from USA, the graphs are for the number of clients for each server and the total bytes tranferred from each server to all the clients.
 
@@ -93,6 +96,8 @@ Still have to refine this query, the plotted data is not useful at all in this s
 	  project = 0 AND 
 	  IS_EXPLICITLY_DEFINED(connection_spec.data_direction) AND 
 	  connection_spec.data_direction = 0 AND 
+	  IS_EXPLICITLY_DEFINED(web100_log_entry.is_last_entry) AND 
+	  web100_log_entry.is_last_entry = True AND
 	  IS_EXPLICITLY_DEFINED(web100_log_entry.snap.HCThruOctetsReceived) AND 
 	  web100_log_entry.snap.HCThruOctetsReceived >= 8192 AND 
 	  IS_EXPLICITLY_DEFINED(web100_log_entry.snap.State) AND 
