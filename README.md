@@ -108,7 +108,7 @@ One of the model querries from the PDE document; I've aggregated the data based 
 	  order by 
 	    date;
 
-![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example01_from_query2.png)
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/example01.png)
 
 RTT: the query used to pull RTT data from the M-Lab BigQuery dataset.
 It selects the following columns: logged time (log_time),M-Lab server IP (connection_spec.server_ip), destination IP for traceroute hop - towards the client - paris_traceroute_hop.dest_ip, average of RTT in the same traceroute and hop.

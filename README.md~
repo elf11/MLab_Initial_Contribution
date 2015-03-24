@@ -116,23 +116,23 @@ The Query is performed using the Paris traceroute M-Lab utility tool and for ent
 data structure:
 date	server	dest	rtt
 
-SELECT
-	log_time as date,
-	connection_spec.server_ip as server,
-	paris_traceroute_hop.dest_ip as dest,
-	AVG(paris_traceroute_hop.rtt) AS rtt
-FROM 
-	[measurement-lab:m_lab.2014_07]
-WHERE
-	project = 3 AND
-    	log_time > 1404172800 AND
-	log_time < 1404259200 AND
-	log_time IS NOT NULL AND
-	connection_spec.server_ip IS NOT NULL AND
-	paris_traceroute_hop.dest_ip IS NOT NULL AND
-	paris_traceroute_hop.rtt IS NOT NULL AND
-	connection_spec.client_ip != paris_traceroute_hop.dest_ip
-GROUP EACH BY
-	date,
-	server,
-	dest;
+	SELECT
+		log_time as date,
+		connection_spec.server_ip as server,
+		paris_traceroute_hop.dest_ip as dest,
+		AVG(paris_traceroute_hop.rtt) AS rtt
+	FROM 
+		[measurement-lab:m_lab.2014_07]
+	WHERE
+		project = 3 AND
+	    	log_time > 1404172800 AND
+		log_time < 1404259200 AND
+		log_time IS NOT NULL AND
+		connection_spec.server_ip IS NOT NULL AND
+		paris_traceroute_hop.dest_ip IS NOT NULL AND
+		paris_traceroute_hop.rtt IS NOT NULL AND
+		connection_spec.client_ip != paris_traceroute_hop.dest_ip
+	GROUP EACH BY
+		date,
+		server,
+		dest;
