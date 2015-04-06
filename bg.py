@@ -7,6 +7,7 @@ import tempfile
 import time
 import matplotlib.pyplot as pyplot
 from matplotlib.lines import Line2D
+import matplotlib.dates as mdates
 import datetime
 
 # query1 struct:
@@ -25,7 +26,7 @@ def bigquery(query):
 	if query is None:
 		os.system("""echo "None" > %s """ % tmpname)
 	else:
-		cmd = "bq -q --format=csv query --max_rows=500 \"%s\" > %s" % (query, tmpname)
+		cmd = "bq -q --format=csv query --max_rows=10000 \"%s\" > %s" % (query, tmpname)
 		print >>l, cmd
 		l.write(cmd+"\n")
 		l.flush()
@@ -109,11 +110,15 @@ def main(argv):
 		x1 = [val for val in server_list]
 		y1 = [val for val in throughput_by_clients]
 		fig = pyplot.figure()
+		fig.suptitle('Upload throughput for US servers - first 100 results', fontsize=14, fontweight='bold')
 		graph = fig.add_subplot(111)
+
+		graph.set_xlabel('indexes of the first 100 US servers')
+		graph.set_ylabel('upload throughput for each server')
 
 		#graph.plot(my_xticks, y1, 'r-o')
 		graph.plot(my_xticks, y1, linestyle='None', marker=styles[0], color='g', markersize=7)
-		graph.set_xticks(my_xticks)
+		#graph.set_xticks(my_xticks)
 		pyplot.savefig('query1.png')
 
 	elif query_no == 2: 
@@ -135,14 +140,30 @@ def main(argv):
 		y = [val for val in throughput_list]
 
 		fig = pyplot.figure()
+		fig.suptitle('Upload throughput over the last 6 months of 2012', fontsize=14, fontweight='bold')
 		graph = fig.add_subplot(111)
 
-		#graph.plot(x, y, 'r-o')
+		graph.set_xlabel('months')
+		graph.set_ylabel('upload throughput')
+
+		months = mdates.MonthLocator() #every month
+		monthsFmt = mdates.DateFormatter('%m')
+
+		#dates = []
+
+		#for i, date in enumerate(date_list):
+		#	dates.append(datetime.datetime.fromtimestamp(int(date)))
+
+		#print dates
+
+		#datemin = datetime.date(dates[0].month, 1, 1)
+		#datemax = datetime.date(dates[len(date_list) - 1].month + 1, 1, 1)
+		#graph.set_xlim(datemin, datemax)
+
+		#graph.xaxis.set_major_locator(months)
+		#graph.xaxis.set_major_formatter(monthsFmt)
+
 		graph.plot(x, y, linestyle='None', marker=styles[1], color='b', markersize=7)
-		#graph.set_xticks(x)
-		#graph.set_xticklabels(
-		#	[datetime.datetime.fromtimestamp(int(date)).strftime('%Y-%m-%d') for date in date_list]
-		#	)
 
 		pyplot.savefig('query2.png')
 	elif query_no == 3: #will run this one with a limit of 100 rows
@@ -160,7 +181,11 @@ def main(argv):
 		y = [val for val in rtt_val]
 
 		fig = pyplot.figure()
+		fig.suptitle('Paris-Traceroute Average(RTT)/Number of\n clients-aggregated using the server', fontsize=14, fontweight='bold')
 		graph = fig.add_subplot(111)
+
+		graph.set_xlabel('number of clients')
+		graph.set_ylabel('Average(RTT)')
 
 		graph.plot(x, y, linestyle='None', marker=styles[1], color='r', markersize=7)
 		pyplot.savefig('query3.png')

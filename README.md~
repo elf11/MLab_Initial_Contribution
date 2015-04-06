@@ -123,7 +123,7 @@ The query is ordered by date, to have the data returned in order. I still have t
 	order by date;
 
 * The graph represents the US server on the X axis, and the uploaded throuput/client on the Y axis. So it's basically how much was an US server loaded by upload from clients. (Though it still looks skewed.)
-![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/query1.png)
+![alt tag](https://raw.githubusercontent.com/elf11/MLab_Initial_Contribution/master/query1_july.png)
 
 
 <b>Third Query</b>
